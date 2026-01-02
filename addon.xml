@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.piccap" name="Piccap Backlight Toggle" version="1.1.0" provider-name="Bryan">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+  </requires>
+  <extension point="xbmc.python.script" library="default.py">
+    <provides>executable</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">Toggle Piccap ambient backlight on LG WebOS TVs</summary>
+    <description lang="en">Controls the Piccap screen capture service on rooted LG WebOS TVs for use with HyperHDR/Hyperion ambient lighting.
+
+Requirements:
+- Rooted LG WebOS TV with Piccap installed
+- SSH access enabled on the TV
+- SSH key authentication configured
+
+Setup:
+1. Generate SSH key on your Kodi device: ssh-keygen -t ed25519
+2. Copy key to TV: cat ~/.ssh/id_ed25519.pub | ssh root@YOUR_TV_IP "mkdir -p ~/.ssh &amp;&amp; cat >> ~/.ssh/authorized_keys"
+3. Configure TV IP and SSH key path in add-on settings
+4. Optional: Map to a remote button via keymap
+
+Keymap example (save to userdata/keymaps/piccap.xml):
+&lt;keymap&gt;&lt;global&gt;&lt;remote&gt;
+  &lt;red&gt;RunScript(script.piccap)&lt;/red&gt;
+&lt;/remote&gt;&lt;/global&gt;&lt;/keymap&gt;
+    </description>
+    <platform>all</platform>
+    <license>MIT</license>
+    <website>https://github.com/webosbrew/piccap</website>
+  </extension>
+</addon>

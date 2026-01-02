@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Piccap Backlight Toggle Keymap
+  
+  Copy this file to: /storage/.kodi/userdata/keymaps/piccap.xml
+  Then restart Kodi for changes to take effect.
+  
+  Change <red> to your preferred button:
+  <red>, <green>, <yellow>, <blue>, <subtitle>, <audio>, <info>, etc.
+  
+  Available commands:
+  - RunScript(script.piccap)           Toggle on/off
+  - RunScript(script.piccap, start)    Force on
+  - RunScript(script.piccap, stop)     Force off
+-->
+<keymap>
+  <global>
+    <remote>
+      <red>RunScript(script.piccap)</red>
+    </remote>
+  </global>
+</keymap>
