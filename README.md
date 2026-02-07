@@ -6,43 +6,37 @@ Toggle the Piccap screen capture service on rooted LG WebOS TVs for use with Hyp
 
 - Rooted LG WebOS TV with [Piccap](https://github.com/webosbrew/piccap) installed
 - SSH access enabled on the TV
-- SSH key authentication configured between your Kodi device and TV
 
 ## Installation
 
-1. Download `script.piccap.zip`
+1. Download `script.piccap.zip` from the [latest release](https://github.com/dangerouslaser/script.piccap/releases/latest)
 2. In Kodi: **Settings → Add-ons → Install from zip file**
 3. Select the downloaded zip file
 
-## SSH Key Setup
+## Setup
 
-Before the add-on will work, you need to set up SSH key authentication:
+The add-on includes a **guided setup wizard** that launches automatically on first run. It will:
 
-### On CoreELEC/LibreELEC:
+1. **Discover your TV** — scans the network via SSDP and lists found LG TVs (or lets you enter an IP manually)
+2. **Generate an SSH key** — creates an ed25519 key if one doesn't exist
+3. **Copy the key to your TV** — prompts for the TV's root password and installs the key
+4. **Test the connection** — verifies everything works
+
+You can re-run the wizard at any time from **Add-on Settings → Setup → Run Setup Wizard**.
+
+### Manual setup (optional)
+
+If you prefer to configure things manually:
 
 ```bash
-# Generate SSH key (press Enter for all prompts)
+# Generate SSH key
 ssh-keygen -t ed25519
 
-# Copy key to your TV (enter TV root password when prompted)
+# Copy key to your TV
 cat ~/.ssh/id_ed25519.pub | ssh root@YOUR_TV_IP "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
-
-# Test connection (should connect without password)
-ssh root@YOUR_TV_IP "echo 'SSH working'"
 ```
 
-### On other Linux systems:
-
-```bash
-ssh-keygen -t ed25519
-ssh-copy-id root@YOUR_TV_IP
-```
-
-## Configuration
-
-1. Go to **Settings → Add-ons → My add-ons → Program add-ons → Piccap Backlight Toggle → Configure**
-2. Enter your TV's IP address
-3. Adjust SSH key path if needed (default: `/storage/.ssh/id_ed25519`)
+Then open the add-on settings and enter your TV's IP address and SSH key path.
 
 ## Usage
 
@@ -69,24 +63,23 @@ Change `<red>` to your preferred button: `<green>`, `<yellow>`, `<blue>`, `<subt
 ### Available commands
 
 ```
-RunScript(script.piccap)          # Toggle on/off
-RunScript(script.piccap, start)   # Force on
-RunScript(script.piccap, stop)    # Force off
+RunScript(script.piccap)           # Toggle on/off
+RunScript(script.piccap, start)    # Force on
+RunScript(script.piccap, stop)     # Force off
+RunScript(script.piccap, setup)    # Run setup wizard
 RunScript(script.piccap, settings) # Open settings
 ```
 
 ## Troubleshooting
 
-**Add-on shows "Please configure TV IP"**
-- Open add-on settings and enter your TV's IP address
-
 **Toggle doesn't work**
+- Re-run the setup wizard from add-on settings
 - Verify SSH key is set up correctly: `ssh root@YOUR_TV_IP "echo test"`
 - Check the SSH key path in settings matches where your key is located
 - Check Kodi log: `/storage/.kodi/temp/kodi.log`
 
 **Permission denied errors**
-- Regenerate SSH keys and copy to TV again
+- Re-run the setup wizard — it will detect the failed connection and offer to re-copy the key
 - Ensure the SSH key path in settings points to your private key (not .pub)
 
 ## License
