@@ -1,6 +1,7 @@
 import xbmc
 import xbmcaddon
 import xbmcgui
+import xbmcvfs
 import subprocess
 import sys
 import socket
@@ -210,6 +211,50 @@ def test_ssh_connection(settings):
     return 'ok' in result.stdout
 
 
+def _offer_keymap_setup():
+    """Offer to map the backlight toggle to a remote button."""
+    dialog = xbmcgui.Dialog()
+
+    if not dialog.yesno('Keymap Setup', 'Map the backlight toggle to a remote button?'):
+        return
+
+    buttons = ['Red', 'Green', 'Yellow', 'Blue', 'Subtitle', 'Audio']
+    button_keys = ['red', 'green', 'yellow', 'blue', 'subtitle', 'audio']
+
+    choice = dialog.select('Choose a button', buttons)
+    if choice < 0:
+        return
+
+    button_name = buttons[choice]
+    button_key = button_keys[choice]
+
+    keymap_xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<keymap>\n'
+        '  <global>\n'
+        '    <remote>\n'
+        '      <{key}>RunScript(script.piccap)</{key}>\n'
+        '    </remote>\n'
+        '  </global>\n'
+        '</keymap>\n'
+    ).format(key=button_key)
+
+    keymaps_dir = xbmcvfs.translatePath('special://userdata/keymaps/')
+    if not os.path.exists(keymaps_dir):
+        os.makedirs(keymaps_dir)
+
+    keymap_path = os.path.join(keymaps_dir, 'piccap.xml')
+    try:
+        with open(keymap_path, 'w') as f:
+            f.write(keymap_xml)
+    except IOError:
+        dialog.ok('Error', 'Failed to write keymap file.')
+        return
+
+    xbmc.executebuiltin('Action(reloadkeymaps)')
+    notify('{} button mapped'.format(button_name))
+
+
 def setup_wizard():
     """Guided setup wizard for first-time configuration."""
     dialog = xbmcgui.Dialog()
@@ -265,6 +310,7 @@ def setup_wizard():
     if test_ssh_connection(settings):
         # Connection works, skip key copying
         ADDON.setSetting('tv_ip', tv_ip)
+        _offer_keymap_setup()
         notify("Setup complete!", xbmcgui.NOTIFICATION_INFO)
         dialog.ok('Setup Complete',
                    'Connected to TV at {}\n\n'
@@ -304,6 +350,7 @@ def setup_wizard():
     notify("Verifying connection...")
     if test_ssh_connection(settings):
         ADDON.setSetting('tv_ip', tv_ip)
+        _offer_keymap_setup()
         notify("Setup complete!", xbmcgui.NOTIFICATION_INFO)
         dialog.ok('Setup Complete',
                    'Connected to TV at {}\n\n'
