@@ -129,21 +129,23 @@ def _get_tv_name(ssdp_response, ip):
 
 
 def ensure_ssh_key(key_path):
-    """Generate an SSH key if one doesn't exist. Returns True on success."""
+    """Generate an SSH key if one doesn't exist. Returns (success, error_msg)."""
     if os.path.exists(key_path):
-        return True
+        return True, None
 
     key_dir = os.path.dirname(key_path)
     try:
         os.makedirs(key_dir, mode=0o700, exist_ok=True)
-    except OSError:
-        return False
+    except OSError as e:
+        return False, 'Cannot create directory {}: {}'.format(key_dir, e)
 
     result = subprocess.run(
         ['ssh-keygen', '-t', 'ed25519', '-f', key_path, '-N', ''],
         capture_output=True, text=True
     )
-    return result.returncode == 0
+    if result.returncode == 0:
+        return True, None
+    return False, result.stderr.strip() or 'ssh-keygen failed'
 
 
 def copy_key_to_tv(settings, password):
@@ -294,11 +296,28 @@ def setup_wizard():
             'No SSH key found at:\n{}\n\nGenerate a new key?'.format(key_path)
         )
         if generate:
-            if ensure_ssh_key(key_path):
+            success, err = ensure_ssh_key(key_path)
+            if success:
                 notify("SSH key generated")
             else:
-                dialog.ok('Error', 'Failed to generate SSH key.\nCheck the key path in settings.')
-                return
+                # Offer ~/.ssh/ fallback if the configured path failed
+                home_key = os.path.expanduser('~/.ssh/id_ed25519')
+                if key_path != home_key and dialog.yesno(
+                    'Key Generation Failed',
+                    '{}\n\nTry generating at {} instead?'.format(err, home_key)
+                ):
+                    success, err = ensure_ssh_key(home_key)
+                    if success:
+                        key_path = home_key
+                        settings['ssh_key_path'] = home_key
+                        ADDON.setSetting('ssh_key_path', home_key)
+                        notify("SSH key generated")
+                    else:
+                        dialog.ok('Error', 'Failed to generate SSH key.\n{}'.format(err))
+                        return
+                else:
+                    dialog.ok('Error', 'Failed to generate SSH key.\n{}'.format(err))
+                    return
         else:
             dialog.ok('SSH Key Required',
                        'An SSH key is needed to connect to the TV.\n'

@@ -1,45 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<settings version="2">
-  <section id="connection">
-    <category id="tv" label="LG TV Connection">
-      <group id="1">
-        <setting id="tv_ip" type="string" label="TV IP Address" help="IP address of your rooted LG WebOS TV">
-          <level>0</level>
-          <default></default>
-          <control type="edit" format="string"/>
-        </setting>
-        <setting id="ssh_user" type="string" label="SSH User" help="SSH username (usually root)">
-          <level>0</level>
-          <default>root</default>
-          <control type="edit" format="string"/>
-        </setting>
-        <setting id="ssh_key_path" type="string" label="SSH Key Path" help="Path to your SSH private key">
-          <level>0</level>
-          <default>/storage/.ssh/id_ed25519</default>
-          <control type="edit" format="string"/>
-        </setting>
-        <setting id="ssh_timeout" type="integer" label="SSH Timeout (seconds)" help="Connection timeout in seconds">
-          <level>1</level>
-          <default>5</default>
-          <control type="edit" format="integer"/>
-          <constraints>
-            <minimum>1</minimum>
-            <maximum>30</maximum>
-          </constraints>
-        </setting>
-      </group>
-    </category>
-  </section>
-  <section id="wizard">
-    <category id="setup" label="Setup">
-      <group id="1">
-        <setting id="run_setup" type="action" label="Run Setup Wizard" help="Guided setup: discover TV, generate SSH keys, and configure connection">
-          <level>0</level>
-          <default/>
-          <control type="button" format="action"/>
-          <data>RunScript(script.piccap,setup)</data>
-        </setting>
-      </group>
-    </category>
-  </section>
+<settings>
+  <category label="LG TV Connection">
+    <setting id="tv_ip" type="text" label="TV IP Address" default="" />
+    <setting id="ssh_user" type="text" label="SSH User" default="root" />
+    <setting id="ssh_key_path" type="text" label="SSH Key Path" default="/storage/.ssh/id_ed25519" />
+    <setting id="ssh_timeout" type="number" label="SSH Timeout (seconds)" default="5" />
+  </category>
 </settings>
