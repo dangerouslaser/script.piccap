@@ -30,4 +30,16 @@
       </group>
     </category>
   </section>
+  <section id="wizard">
+    <category id="setup" label="Setup">
+      <group id="1">
+        <setting id="run_setup" type="action" label="Run Setup Wizard" help="Guided setup: discover TV, generate SSH keys, and configure connection">
+          <level>0</level>
+          <default/>
+          <control type="button" format="action"/>
+          <data>RunScript(script.piccap,setup)</data>
+        </setting>
+      </group>
+    </category>
+  </section>
 </settings>
